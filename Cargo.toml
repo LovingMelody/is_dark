@@ -14,7 +14,3 @@ cfg-if = "^1.0"
 [target.'cfg(windows)'.dependencies]
 winreg = "0.9"
 
-[features]
-default_dark = []
-default_light = []
-default = ["default_light"]

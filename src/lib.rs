@@ -1,7 +1,3 @@
-#[cfg(all(feature = "default_dark", feature = "default_light"))]
-compile_error!(
-    "feature \"default_dark\" and feature \"default_light\" cannot be enabled at the same time"
-);
 
 use std::error::Error;
 
@@ -15,16 +11,6 @@ mod macos;
 mod time;
 
 pub use crate::time::SmartTime;
-
-#[cfg(feature = "default_dark")]
-pub(crate) const DEFAULT_DARK: bool = true;
-
-#[cfg(any(
-    feature = "default_light",
-    not(any(feature = "default_dark", feature = "default_light"))
-))]
-pub(crate) const DEFAULT_DARK: bool = false;
-
 /// Trait to detect if it is dark
 pub trait IsItDark
 where
@@ -107,11 +93,11 @@ mod generic {
     impl crate::IsItDark for GenericDetectDark {
         type Error = std::io::Error;
         fn is_dark(&self) -> Result<bool, Self::Error> {
-            self.sys.is_dark().or_else(|_| {
+            self.sys.is_dark().or_else(|e| {
                 if let Some(t) = self.smart_time {
                     t.is_dark()
                 } else {
-                    Ok(crate::DEFAULT_DARK)
+                    Err(e)
                 }
             })
         }
