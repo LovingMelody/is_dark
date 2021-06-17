@@ -1,0 +1,20 @@
+[package]
+name = "is_dark"
+version = "0.1.0"
+authors = ["Fuzen <me@fuzen.cafe>"]
+edition = "2018"
+license = "MIT/Apache-2.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = "^0.4"
+cfg-if = "^1.0"
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.9"
+
+[features]
+default_dark = []
+default_light = []
+default = ["default_light"]
