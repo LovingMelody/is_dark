@@ -23,10 +23,11 @@ pub struct SmartTime {
 
 impl SmartTime {
     pub fn new(longitude: f64, latitude: f64, elevation: f64) -> Self {
-        let st = suntime::SunTime::calculate(Utc::today(), latitude, longitude, elevation);
+        let st =
+            suntime::SunTime::calculate(Utc::now().date_naive(), latitude, longitude, elevation);
         Self {
-            light: st.rise.naive_local(),
-            dark: st.set.naive_local(),
+            light: st.rise,
+            dark: st.set,
             longitude,
             latitude,
             elevation,

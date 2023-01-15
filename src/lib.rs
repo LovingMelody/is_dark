@@ -1,12 +1,12 @@
-
 use std::error::Error;
 
-//#[cfg(target_os = "linux")]
+// Only if feature is windows and target_os is windows
+#[cfg(all(target_os = "linux", feature = "os"))]
 mod linux;
-#[cfg(target_os = "windows")]
-mod windows;
-// #[cfg(target_os="macos")]
+#[cfg(all(target_os = "macos", feature = "os"))]
 mod macos;
+#[cfg(all(target_os = "windows", feature = "os"))]
+mod windows;
 
 mod time;
 
@@ -43,28 +43,31 @@ mod generic {
     use cfg_if::cfg_if;
 
     use crate::SmartTime;
-    #[cfg(target_os = "windows")]
+    #[cfg(all(target_os = "windows", feature = "os"))]
     #[derive(Default)]
     pub struct GenericDetectDark {
         sys: crate::windows::Windows,
         smart_time: Option<SmartTime>,
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(all(target_os = "linux", feature = "os"))]
     #[derive(Default)]
     pub struct GenericDetectDark {
         sys: crate::linux::Linux,
         smart_time: Option<SmartTime>,
     }
 
-    #[cfg(target_os = "macos")]
+    #[cfg(all(target_os = "macos", feature = "os"))]
     #[derive(Default)]
     pub struct GenericDetectDark {
         sys: crate::linux::Linux,
         smart_time: Option<SmartTime>,
     }
 
-    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    #[cfg(any(
+        not(any(target_os = "windows", target_os = "macos", target_os = "linux")),
+        not(feature = "os")
+    ))]
     #[derive(Default)]
     pub struct GenericDetectDark {
         sys: SmartTime,

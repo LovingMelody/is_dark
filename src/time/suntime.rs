@@ -234,21 +234,20 @@ SOFTWARE.
    limitations under the License.
 */
 
-use chrono::{Date, DateTime, Duration, NaiveDate, Utc};
-
+use chrono::{Duration, NaiveDate, NaiveDateTime};
 
 const HOUR_ANGLE_TO_MINUTES_FACTOR: f64 = 4.0;
 
 const ARGUMENT_OF_PERIHELION: f64 = 102.9372;
 
 pub(crate) struct SunTime {
-    pub(crate) rise: DateTime<Utc>,
-    pub(crate) set: DateTime<Utc>,
+    pub(crate) rise: NaiveDateTime,
+    pub(crate) set: NaiveDateTime,
 }
 
 impl SunTime {
     pub(crate) fn calculate(
-        date: Date<Utc>,
+        date: NaiveDate,
         latitude: f64,
         longitude: f64,
         elevation: f64,
@@ -256,7 +255,8 @@ impl SunTime {
         // Based on https://en.wikipedia.org/wiki/Sunrise_equation
         let elevation_correction = -2.076 * (elevation.sqrt()) / 60.0;
 
-        let jan_2000 = Date::<Utc>::from_utc(NaiveDate::from_ymd(2000, 1, 1), Utc);
+        let jan_2000 =
+            NaiveDate::from_ymd_opt(2000, 1, 1).expect("Failed to create date 2000-01-01");
         let time_since_2000: Duration = date.signed_duration_since(jan_2000);
 
         let mean_solar_time = (time_since_2000.num_days() as f64) + 0.0008 - (longitude / 360.0);
@@ -278,7 +278,7 @@ impl SunTime {
         let solar_transit = mean_solar_time + 0.0053 * solar_mean_anomaly.to_radians().sin()
             - 0.0069 * (2.0 * ecliptic_longitude).to_radians().sin();
         let solar_transit_date = jan_2000 + Duration::days(solar_transit.round() as i64);
-        let solar_transit_date = solar_transit_date.and_hms(12, 0, 0)
+        let solar_transit_date = solar_transit_date.and_hms_opt(12, 0, 0).unwrap()
             + Duration::seconds(
                 ((solar_transit * 24.0 * 60.0 * 60.0) % (24.0 * 60.0 * 60.0)).round() as i64,
             );
